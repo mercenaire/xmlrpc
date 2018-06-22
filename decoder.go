@@ -360,7 +360,17 @@ func (dec *decoder) decodeValue(val reflect.Value) error {
 				pv.SetBool(v)
 				val.Set(pv)
 			} else if err = checkType(val, reflect.Bool); err != nil {
-				return err
+				// Hack by JJ in case we expected an int but got a boolean value
+				if checkType(val, reflect.Int) == nil {
+					if v {
+						val.SetInt(1)
+					} else {
+						val.SetInt(0)
+					}
+				} else {
+					return err
+				}
+
 			} else {
 				val.SetBool(v)
 			}
